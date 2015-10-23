@@ -1,23 +1,25 @@
 from pico2d import *
 
-# class Background():
-#     def __init__(self):
-#         self.image = load_image('brack board.png')
-#     def draw(self):
-#         self.image.draw(400, 300)
+
+from pico2d import *
+
+class Background():
+    def __init__(self):
+        self.image = load_image('brack board.png')
+    def draw(self):
+        self.image.draw(400, 300)
 
 class Map():
-    image = None
-
-    def __init__(self,place,place2):
-        self.y=80+(place2*40)
-        self.x=20*(place*2+1)
+    def __init__(self):
+        self.y=80
+        self.x=20
         self.imagestat=0
-        if Map.image == None:
-            Map.image =load_image('rect obstacle.png')
+        self.image =load_image('rect obstacle.png')
+    def placenum(self,place):
+        self.x=self.x*(place*2+1)
 
     def update(self):
-        self.x-=4
+        self.x-=1;
 
     def draw(self):
          self.image.clip_draw(0, 0, 40, 40,self.x,self.y)
@@ -35,46 +37,31 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             start = False
 
-def stage1():  #시간별 장애물생성
-    global timer
-    if timer == 30:
-        mapping.append(Map(19,1))
-
 
 start = True
 
 open_canvas()
-mapping= [Map(i,0) for i in range(19)]
 
-timer=0
-mapstate=0
-# background= Background()
+background= Background()
+mapping= [Map() for i in range(20)]
 
+for i in range(20):
+    mapping[i].placenum(i)
 
 while start:
 
     handle_events()
-
-    if timer % 10 == 0:
-        del(mapping[0])
-        mapping.append(Map(19,0))
-        mapstate+=1
-
-    stage1()
-
-
-    timer+=1
-
     for map in mapping:
         map.update()
 
     clear_canvas()
-    # background.draw()
+    background.draw()
     for map in mapping:
         map.draw()
     update_canvas()
 
-    delay(0.05)
+    delay(0.01)
+
 
 
 close_canvas()
