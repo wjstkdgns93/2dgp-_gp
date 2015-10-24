@@ -12,7 +12,7 @@ class Land:
 class Character():
     def __init__(self):
         self.x,self.y=200,120
-        # self.jumpHeight= 20
+        self.maxhight=90
         self.jumpnum=0
         self.dir=0
         self.flag=0
@@ -42,31 +42,72 @@ class Character():
         self.image.clip_draw(0, 0, 40, 40,self.x,self.y)
 
 class Obstacle():
+    global obsnum,timer
+    global character,mapping
 
+    rect=None
     def __init__(self):
-        self.y=0
-        self.x=0
+        self.y=-100
+        self.x=-100
         self.imagestat=0
-        self.image =load_image('rect obstacle.png')
+        if Obstacle.rect==None:
+            self.image =load_image('rect obstacle.png')
+
+
     def placenum(self,placex,placey):
         self.x=placex
-        self.y=placey
+        self.y=80+(placey*40)
 
     def update(self):
-        self.x-=5;
+        self.x-=5
 
     def draw(self):
         self.image.clip_draw(0, 0, 40, 40,self.x,self.y)
+        #임시 충돌체크(장애물제거)
+        if character.x+20>=self.x-20 and character.x-20<=self.x+20:
+            if character.y-20<self.y+20:
+                 for i in range(15):
+                    mapping.pop(i)
+
+
+def stage1():
+    global timer,mapping
+
+    if timer%10==0:
+        for i in range(15):
+            mapping.append(Obstacle())
+    #지나간 맵 제거
+    if(len(mapping)>270):
+        for i in range(15):
+            mapping.pop(i)
+
+    #시간별 장애물생성
+    if timer==100:
+        mapping[len(mapping)-14].placenum(800,1)
+    if timer==200:
+        mapping[len(mapping)-14].placenum(800,1)
+    if timer==300:
+        mapping[len(mapping)-14].placenum(800,1)
+    if timer==400:
+        mapping[len(mapping)-14].placenum(800,1)
+    if timer==500:
+        mapping[len(mapping)-14].placenum(800,1)
+    if timer==650:
+        mapping[len(mapping)-14].placenum(800,1)
+        mapping[len(mapping)-13].placenum(800,2)
+    if timer==800:
+        mapping[len(mapping)-14].placenum(800,1)
+        mapping[len(mapping)-13].placenum(800,2)
 
 
 def handle_events():
-
+    global start
     events = get_events()
-
     for event in events:
         if event.type == SDL_QUIT:
-            start=False
             game_framework.quit()
+        if event.type ==SDL_KEYDOWN and event.key==SDLK_ESCAPE :
+            start=False
         if event.type == SDL_KEYDOWN and event.key == SDLK_x and character.y<=120:
             character.xclick(50)
             character.clickflag(1)
@@ -74,25 +115,14 @@ def handle_events():
         elif event.type == SDL_KEYUP and event.key == SDLK_x:
             character.clickflag(0)
 
-def stage1():
-    global timer
-    i=0
-    if timer%8==0:
-        mapping[i].placenum(800,120)
-
-
-start = True
 character = None
-mapping=None
+mapping=[]
 land=None
 timer=0
 
 def enter():
-    global character,mapping,land
-    open_canvas()
+    global character,land,mapping
     character= Character()
-    mapping= [Obstacle() for i in range(15)]
-    stage1()
     land=Land()
 
 def exit():
@@ -104,9 +134,16 @@ def exit():
 def update():
     global timer
     character.update()
+    stage1()
     for Obstacle in mapping:
         Obstacle.update()
-    delay(0.01)
+    #점점 빨라짐
+    if timer>=600:
+        delay(0.005)
+    elif timer>=300:
+         delay(0.007)
+    else:
+        delay(0.01)
     timer+=1
 
 def draw():

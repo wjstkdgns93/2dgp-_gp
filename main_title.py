@@ -1,13 +1,13 @@
 import game_framework
 import characterstage
-
 from pico2d import *
-name = "TestTitle"
+
+name = "TitleState"
 image = None
 
 def enter():
     global image
-    open_canvas(800, 600)
+    open_canvas()
     image = load_image('test title.png')
 
 def exit():
