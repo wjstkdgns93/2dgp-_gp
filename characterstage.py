@@ -1,4 +1,5 @@
 import game_framework
+import time
 from pico2d import *
 
 
@@ -11,10 +12,15 @@ class Land:
 
 class Character():
     def __init__(self):
-        self.x,self.y=200,120
-        self.maxhight=90
+        self.x,self.y=200,0
+        self.base_y=120
+
+
+        #점프상태 0 점프 1 떨어짐
         self.jumpnum=0
+        #점프키
         self.dir=0
+        #점프키 고정확인
         self.flag=0
         self.image =load_image('character1.png')
 
@@ -22,7 +28,7 @@ class Character():
         self.flag=flag
     def xclick(self,dir):
         self.dir=dir
-
+        self.y=self.base_y
     def update(self):
         if self.dir!=0:
              self.dir-=1
@@ -71,33 +77,33 @@ class Obstacle():
 
 
 def stage1():
-    global timer,mapping
+    global timer,chtime
 
-    if timer%10==0:
+    if timer%8==0:
         for i in range(15):
             mapping.append(Obstacle())
     #지나간 맵 제거
-    if(len(mapping)>270):
+    if(len(mapping)>400):
         for i in range(15):
             mapping.pop(i)
 
     #시간별 장애물생성
     if timer==100:
-        mapping[len(mapping)-14].placenum(800,1)
+        mapping[len(mapping)-15].placenum(800,1)
     if timer==200:
-        mapping[len(mapping)-14].placenum(800,1)
+        mapping[len(mapping)-15].placenum(800,1)
     if timer==300:
-        mapping[len(mapping)-14].placenum(800,1)
+        mapping[len(mapping)-15].placenum(800,1)
     if timer==400:
-        mapping[len(mapping)-14].placenum(800,1)
+        mapping[len(mapping)-15].placenum(800,1)
     if timer==500:
-        mapping[len(mapping)-14].placenum(800,1)
+        mapping[len(mapping)-15].placenum(800,1)
     if timer==650:
-        mapping[len(mapping)-14].placenum(800,1)
-        mapping[len(mapping)-13].placenum(800,2)
+        mapping[len(mapping)-15].placenum(800,1)
+        mapping[len(mapping)-15].placenum(800,2)
     if timer==800:
-        mapping[len(mapping)-14].placenum(800,1)
-        mapping[len(mapping)-13].placenum(800,2)
+        mapping[len(mapping)-15].placenum(800,1)
+        mapping[len(mapping)-14].placenum(800,2)
 
 
 def handle_events():
@@ -119,9 +125,11 @@ character = None
 mapping=[]
 land=None
 timer=0
+# start_time=time.time()
+chtime=0
 
 def enter():
-    global character,land,mapping
+    global character,land,mapping,start_time
     character= Character()
     land=Land()
 
@@ -132,7 +140,8 @@ def exit():
     close_canvas()
 
 def update():
-    global timer
+    global timer,chtime,start_time
+    # chtime=time.time()-start_time
     character.update()
     stage1()
     for Obstacle in mapping:
